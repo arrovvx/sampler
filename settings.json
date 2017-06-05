@@ -1,0 +1,18 @@
+{
+	"_comment": "Please edit this accordingly on different systems.",
+	
+	"serialPort": "COM3",
+	"serialReadPeriod": 1,
+	"serialBaudRate": 9600,
+	
+	"sendAccelerometerData": false,
+	"controllerIP": "127.0.0.1",
+	"SamplerWebsocketPort": 8889,
+	"controllerSendPeriod": 2,
+	"controllerSendPipe": 10,
+	
+	"TLCIP": "127.0.0.1",
+	"TLCWebsocketPort": 8890,
+	
+	"loggerLevel": "ERROR"
+}

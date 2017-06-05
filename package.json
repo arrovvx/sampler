@@ -1,0 +1,13 @@
+{
+  "name": "sampler",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./sampler"
+  },
+  "dependencies": {
+    "fs": "0.0.2",
+    "serialport": "^4.0.7",
+    "ws": "^1.1.1"
+  }
+}

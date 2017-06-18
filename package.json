@@ -6,6 +6,7 @@
     "start": "node ./sampler"
   },
   "dependencies": {
+    "debug": "^2.6.8",
     "fs": "0.0.2",
     "serialport": "^4.0.7",
     "ws": "^1.1.1"

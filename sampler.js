@@ -17,7 +17,7 @@ var error = 0;
 
 //performance variables
 var count = 0;
-var sampleSize = 1000000;
+var sampleSize = 100000 * settings.performanceSampleSize;
 var time;
 
 function parseSerial(data){
@@ -25,24 +25,31 @@ function parseSerial(data){
 			
 			if (state == 2 && !(data[i] & 128)){
 				value += data[i];
-				
 				WSConn.store(value, ch);
 				state = 0;
+				
 			} else if (state == 1 && !(data[i] & 128)){
 				value += (data[i] << 7);
 				state++;
+				success++;
 				
 			} else if (state == 0 && (data[i] & 128) ){
 				ch = (data[i] & 124) >> 2;
 				value = ((data[i] & 3) << 14);
 				state++;
 				success++;
+				
 			} else{
+				debug('Serial Data Error! %d Header bit: %d', state, ((data[i] & 128) >> 7));
 				error++;
-				debug('Serial Data Error! %s Header bit: %d', state, ((data[i] & 128) >> 7));
+				
+				if(state > 0) i--;
+				state = 0;
 			}
 			
 	}
+	
+				
 	if(error){
 		debug('Error detected. Success: %d, Error: %d', success,error);
 		success = 0;
@@ -54,7 +61,6 @@ function parseSerial(data){
 function serialPerformance(data){
 	
 	for (i = 0; i < data.length;i++){
-		
 			//performance measurements
 			if(count == 0) {
 				time = new Date().getTime();
@@ -62,9 +68,13 @@ function serialPerformance(data){
 			}
 			else if(count >= sampleSize) {
 				var newtime = new Date().getTime();
-				debug('Sampling Speed: %d Hz', (sampleSize / (3*(newtime - time)/1000)).toFixed(2));
+				var result = (sampleSize / (3*(newtime - time)/1000));
+				
+				debug('Sampling Speed: %d Hz', result.toFixed(2));
+				
 				WSConn.serialport.removeAllListeners('data');
 				WSConn.serialport.on('data', parseSerial);
+				WSConn.storePerfResults(result);
 				
 				i = data.length;
 				debug('-----------------------------------');
@@ -79,9 +89,14 @@ WSConn.serialport.on('open', function(){
 	WSConn.serialport.flush();
 	debug('Serial Opened');
 	
-	debug('-----Starting Performance Test-----');
-	debug('-----------------------------------');
-	WSConn.serialport.on('data', serialPerformance);
+	
+	if(settings.serialPerformance){
+		
+		debug('-----Starting Performance Test-----');
+		debug('-----------------------------------');
+		WSConn.serialport.on('data', serialPerformance);
+	} else
+		WSConn.serialport.on('data', parseSerial);
 	
 });
 

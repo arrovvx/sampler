@@ -1,9 +1,12 @@
 {
 	"_comment": "Please edit this accordingly on different systems.",
 	
-	"serialPort": "COM4",
+	"serialPort": "COM3",
 	"serialBaudRate": 115200,
 	"channelNumber": 6,
+	
+	"serialPerformance": true,
+	"performanceSampleSize": 10,
 	
 	"controllerIP": "127.0.0.1",
 	"SamplerWebsocketPort": 8889,

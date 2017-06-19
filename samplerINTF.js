@@ -20,7 +20,8 @@ module.exports = function (settings){
 	
 	//for performance measurements
 	var counter = 0;
-	var idd= null;	
+	var idd= null;
+	var perfResult = 0;	
 	
 	//setup the serial port 
 	serialport = new SerialPort(settings.serialPort,{
@@ -39,6 +40,7 @@ module.exports = function (settings){
 	});
 	
 	wssClient.on('message', function(message) {
+		
 		var controller = JSON.parse(message);
 		debug("server msg", message);
 		
@@ -58,18 +60,18 @@ module.exports = function (settings){
 	});
 	
 	wssClient.on('close', function(message) {
+		
 		clearInterval(idd);
 		debug('Connection to server closed. Message received: %s', message);
 		process.exit(0);
-		
 	});
 	
 	wssClient.on('error', function(error) {
+		
 		if(error != null) {
 			debug('Websocket error: %s', error);
 			process.exit(0);
 		}
-		
 	});
 	
 	//public variables and functions
@@ -78,6 +80,7 @@ module.exports = function (settings){
 	module.wsSend = wssClient.send;
 	 
 	module.store = function(inputValue, channel){
+		
 		var time = new Date().getTime();
 		
 		if (channel >= settings.channelNumber){
@@ -92,14 +95,21 @@ module.exports = function (settings){
 		}
 	};
 	
+	module.storePerfResults = function(result){
+		
+		perfResult = result;
+	};
+	
 	//internal functions
 	function flushTempInput(){
+		
 		for(var i = 0, len = tempInput.length; i < len; i++){
 			tempInput[i] = [];
 		}
 	};
 	
 	function networkPerformanceTest(){
+		
 		var time = new Date().getTime();
 		wssClient.send(JSON.stringify({"output":1,"input":[1023,1023,1023,1023,1023,1023,1023,1023], "timestamp": time})); 
 		counter = counter + 1;

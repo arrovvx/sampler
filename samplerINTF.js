@@ -48,7 +48,7 @@ module.exports = function (settings){
 			startSend = 1;
 			
 		} else if(controller.command == "stop"){
-			startSend = 1;
+			startSend = 0;
 			
 		}else if(controller.command == "ping"){
 			wssClient.send(JSON.stringify({"message":"pong"})); 
@@ -87,10 +87,13 @@ module.exports = function (settings){
 			debug("Error! Channel number exceeds limit of", settings.channelNumber);
 		} else if (tempInput.length < settings.controllerSendBufferSize){
 			tempInput[channel] = inputValue - 32000;
+			
 			if(channel == 0){
 				timeStamp = time;
-			} else if(channel == settings.channelNumber - 1 && startSend == 1){
-				wssClient.send(JSON.stringify({"name": "EMG","input":tempInput , "timestamp": time})); 
+			}
+			
+			if(channel == settings.channelNumber - 1 && startSend == 1){
+				wssClient.send(JSON.stringify({"name": "audio","input":tempInput , "timestamp": time})); 
 			}
 		}
 	};

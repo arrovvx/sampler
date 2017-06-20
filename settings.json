@@ -3,9 +3,9 @@
 	
 	"serialPort": "COM3",
 	"serialBaudRate": 115200,
-	"channelNumber": 6,
+	"channelNumber": 1,
 	
-	"serialPerformance": true,
+	"serialPerformance": false,
 	"performanceSampleSize": 10,
 	
 	"controllerIP": "127.0.0.1",

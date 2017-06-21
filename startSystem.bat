@@ -11,6 +11,7 @@ for /f "skip=1 usebackq tokens=2 delims=:" %%f in (`ipconfig ^| findstr /c:%ip_a
 )
 :skipdefault
 echo Docker Host IP:%dockerhostIP%
+docker start mongodb >nul 2>nul
 docker run -p 27017:27017 --name mongodb -d arrovvx/mongodb:default 2>nul
 docker stop controller >nul 2>nul
 docker rm controller >nul 2>nul

@@ -15,12 +15,18 @@ module.exports = function (settings){
 	
 	//Variables for sending data
 	var startSend = 0;
-	var tempInput = new Array(settings.channelNumber);
+	var tempInput = new Array(settings.controllerPayloadSize);
 	var timeStamp = 0;
+	var payloadNum = 0;
+	
+	for(var index = 0, len=settings.controllerPayloadSize; index < len; index++){
+		tempInput[index] = new Array(settings.channelNumber);
+	}
 	
 	//for performance measurements
 	var counter = 0;
 	var idd= null;
+	var payload = [];
 	var perfResult = 0;	
 	
 	//setup the serial port 
@@ -54,16 +60,23 @@ module.exports = function (settings){
 			wssClient.send(JSON.stringify({"message":"pong"})); 
 			
 		} else if(controller.command == "startPerformance"){
+			var oneLoad = [];
+			for(var i = 0, len = settings.channelNumber; i < len; i++){
+				oneLoad.push(1023);
+			}
+			for(var i = 0, len = settings.controllerPayloadSize; i < len; i++){
+				payload.push(oneLoad);
+			}
 			idd = setInterval( networkPerformanceTest, 1);
 			
 		} 
 	});
 	
 	wssClient.on('close', function(message) {
-		
 		clearInterval(idd);
 		debug('Connection to server closed. Message received: %s', message);
 		process.exit(0);
+		
 	});
 	
 	wssClient.on('error', function(error) {
@@ -81,19 +94,22 @@ module.exports = function (settings){
 	 
 	module.store = function(inputValue, channel){
 		
-		var time = new Date().getTime();
-		
 		if (channel >= settings.channelNumber){
 			debug("Error! Channel number exceeds limit of", settings.channelNumber);
-		} else if (tempInput.length < settings.controllerSendBufferSize){
-			tempInput[channel] = inputValue - 32000;
+		} else {
+			tempInput[payloadNum][channel] = inputValue;
 			
 			if(channel == 0){
-				timeStamp = time;
+				timeStamp = new Date().getTime();
 			}
 			
 			if(channel == settings.channelNumber - 1 && startSend == 1){
-				wssClient.send(JSON.stringify({"name": "audio","input":tempInput , "timestamp": time})); 
+				payloadNum++;
+				if(payloadNum >= settings.controllerPayloadSize){
+					wssClient.send(JSON.stringify({"name": "audio","input":tempInput , "timestamp": timeStamp})); 
+					payloadNum = 0;
+				}
+				
 			}
 		}
 	};
@@ -114,7 +130,7 @@ module.exports = function (settings){
 	function networkPerformanceTest(){
 		
 		var time = new Date().getTime();
-		wssClient.send(JSON.stringify({"output":1,"input":[1023,1023,1023,1023,1023,1023,1023,1023], "timestamp": time})); 
+		wssClient.send(JSON.stringify({"output":1,"input":payload, "timestamp": time})); 
 		counter = counter + 1;
 		
 		if(counter >= 10000) {

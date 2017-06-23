@@ -3,15 +3,14 @@
 	
 	"serialPort": "COM3",
 	"serialBaudRate": 115200,
-	"channelNumber": 1,
+	"channelNumber": 6,
 	
 	"serialPerformance": false,
 	"performanceSampleSize": 10,
 	
 	"controllerIP": "127.0.0.1",
 	"SamplerWebsocketPort": 8889,
-	"controllerSendPeriod": 1,
-	"controllerSendBufferSize": 1000,
+	"controllerPayloadSize": 40,
 	
 	"loggerLevel": "ERROR"
 }
